@@ -18,5 +18,12 @@ async def on_ready():
         f'{guild.name}(id: {guild.id})'
     )
 
+@client.event
+async def on_member_join(member):
+	await member.create_dm()
+	await member.dm_channel.send(
+		f'VOLTRON WELCOMES YOU, {member.name}'
+	)
+
 client.run(TOKEN)
 
