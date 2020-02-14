@@ -25,5 +25,19 @@ async def on_member_join(member):
 		f'VOLTRON WELCOMES YOU, {member.name}'
 	)
 
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.content == 'assemble!':
+        response = 'LETS GO VOLTRON FORCE! ASSEMBLE!'
+        await message.channel.send(response)
+
+@client.event
+async def on_ready():
+    print(f'{client.user.name} has connected to Discord!')
+
+
 client.run(TOKEN)
 
