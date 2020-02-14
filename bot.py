@@ -18,6 +18,8 @@ async def on_ready():
         f'{guild.name}(id: {guild.id})'
     )
 
+
+# Welcome DM
 @client.event
 async def on_member_join(member):
 	await member.create_dm()
@@ -25,6 +27,8 @@ async def on_member_join(member):
 		f'VOLTRON WELCOMES YOU, {member.name}'
 	)
 
+
+# Sends a volton message on Assemble!
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -34,6 +38,7 @@ async def on_message(message):
         response = 'LETS GO VOLTRON FORCE! ASSEMBLE!'
         await message.channel.send(response)
 
+# Keep track of new users who join
 @client.event
 async def on_ready():
     print(f'{client.user.name} has connected to Discord!')
