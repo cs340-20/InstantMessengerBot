@@ -34,7 +34,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content == 'assemble!':
+    if message.content == '$assemble!':
         response = 'LETS GO VOLTRON FORCE! ASSEMBLE!'
         await message.channel.send(response)
 
