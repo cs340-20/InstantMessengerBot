@@ -29,7 +29,6 @@ async def makechannel(ctx, channel_name='Voltron-Conference'):
 #translate command 
 @bot.command(name='translate')
 async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='english'):
-    guild = ctx.guild
     
     #sets up translator object
     translator = Translator()
@@ -148,7 +147,9 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
     #translator(phrase, destination lang, source language)
     newlang = translator.translate(msg, LANGCODES[dst.lower()], src='auto')
 
+    #print to console and print to server
     print(newlang.text)
+    await ctx.send(newlang.text)
 
 
 
