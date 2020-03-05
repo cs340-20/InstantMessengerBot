@@ -3,6 +3,7 @@
 
 import os
 import discord
+import word_filter
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -36,9 +37,21 @@ async def on_member_join(member):
 async def on_message(message):
 	if (message.author == bot.user):
 		return
+
+	#checks all user input against list of banned words
+	if (word_filter.banned_string(message.content)):
+		await message.delete()
+		await message.author.send('Please no swearing in my Christian Discord Server')
+
 	await bot.process_commands(message)
 
-
+#adds a word to a file containing all banned words
+@bot.command(name='ban_word')
+async def ban_word(ctx, *, word = ''):
+	
+	if(word != ''):
+		word_filter.ban_string(word)
+	
 #makes text channels from user input
 @bot.command(name='makechannel')
 #@commands.has_role('admin')
