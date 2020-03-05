@@ -1,9 +1,8 @@
 # bot1.py
 # A rewrite of bot.py, changing to the bot subclass from client superclass
-
 import os
-import discord
 
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from googletrans import Translator
@@ -14,33 +13,9 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 bot = commands.Bot(command_prefix='$')
 
-#
-@bot.event
-async def on_ready():
-    guild = discord.utils.get(bot.guilds, name=GUILD)
-    print(
-        f'{bot.user} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})'
-    )
-
-# Welcome DM
-@bot.event
-async def on_member_join(member):
-	await member.create_dm()
-	await member.dm_channel.send(
-		f'VOLTRON WELCOMES YOU, {member.name}'
-	)
-
-@bot.event
-async def on_message(message):
-	if (message.author == bot.user):
-		return
-	await bot.process_commands(message)
-
 # Create new channels
 ## NEEDS TO: determine admin permissions of the cmd caller, 
-# and check if the room being made already exist.
-
+# and check if the room being made already exists
 @bot.command(name='makechannel')
 #@commands.has_role('admin')
 async def makechannel(ctx, channel_name='Voltron-Conference'):
@@ -49,6 +24,7 @@ async def makechannel(ctx, channel_name='Voltron-Conference'):
 	if not existing_channel:		
 		print(f'Creating new channel: {channel_name}')
 		await guild.create_text_channel(channel_name)
+
 
 #translate command 
 @bot.command(name='translate')
@@ -175,21 +151,6 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
     print(newlang.text)
     await ctx.send(newlang.text)
 
-@bot.event
-async def on_ready():
-    guild = discord.utils.get(bot.guilds, name=GUILD)
-    print(
-        f'{bot.user} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})'
-    )
-
-# Welcome DM
-@bot.event
-async def on_member_join(member):
-	await member.create_dm()
-	await member.dm_channel.send(
-		f'VOLTRON WELCOMES YOU, {member.name}'
-	)
 
 
 bot.run(TOKEN)
