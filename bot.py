@@ -14,7 +14,7 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 bot = commands.Bot(command_prefix='$')
 
-#
+#Prints to console connection confirmation
 @bot.event
 async def on_ready():
     guild = discord.utils.get(bot.guilds, name=GUILD)
@@ -23,7 +23,7 @@ async def on_ready():
         f'{guild.name}(id: {guild.id})'
     )
 
-# Welcome DM
+# Welcome DM to new user
 @bot.event
 async def on_member_join(member):
 	await member.create_dm()
@@ -31,16 +31,15 @@ async def on_member_join(member):
 		f'VOLTRON WELCOMES YOU, {member.name}'
 	)
 
+#client message parsing 
 @bot.event
 async def on_message(message):
 	if (message.author == bot.user):
 		return
 	await bot.process_commands(message)
 
-# Create new channels
-## NEEDS TO: determine admin permissions of the cmd caller, 
-# and check if the room being made already exist.
 
+#makes text channels from user input
 @bot.command(name='makechannel')
 #@commands.has_role('admin')
 async def makechannel(ctx, channel_name='Voltron-Conference'):
@@ -173,22 +172,5 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
     #print to console and print to server
     print(newlang.text)
     await ctx.send(newlang.text)
-
-@bot.event
-async def on_ready():
-    guild = discord.utils.get(bot.guilds, name=GUILD)
-    print(
-        f'{bot.user} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})'
-    )
-
-# Welcome DM
-@bot.event
-async def on_member_join(member):
-	await member.create_dm()
-	await member.dm_channel.send(
-		f'VOLTRON WELCOMES YOU, {member.name}'
-	)
-
 
 bot.run(TOKEN)
