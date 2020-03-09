@@ -2,7 +2,7 @@
 def ban_string(message):
 
 	with open ("bad_words.txt", "a+") as bad:
-		bad.write(message.lower())
+		bad.write(message)
 		bad.write('\n')
 	bad.close()
 
@@ -22,7 +22,7 @@ def banned_string(message):
 	msg_words = [line.strip() for line in msg_words]
 
 	for word in msg_words:
-		if word.lower() in bad_words:
+		if word in bad_words:
 			return True
  
 	return False
