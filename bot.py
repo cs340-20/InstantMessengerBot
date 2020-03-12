@@ -40,8 +40,10 @@ async def on_message(message):
 
 	#checks all user input against list of banned words
 	if (word_filter.banned_string(message.content)):
+		user = message.author
 		await message.delete()
 		await message.author.send('Please no swearing in my Christian Discord Server')
+		print(f'Banned message from {user}')
 
 	await bot.process_commands(message)
 
@@ -183,7 +185,7 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
     newlang = translator.translate(msg, LANGCODES[dst.lower()], src='auto')
 
     #print to console and print to server
-    print(newlang.text)
+    print(f'translated {msg} to {newlang.text}')
     await ctx.send(newlang.text)
 
 bot.run(TOKEN)
