@@ -3,6 +3,7 @@
 
 import os
 import discord
+import word_filter
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -36,9 +37,23 @@ async def on_member_join(member):
 async def on_message(message):
 	if (message.author == bot.user):
 		return
+
+	#checks all user input against list of banned words
+	if (word_filter.banned_string(message.content)):
+		user = message.author
+		await message.delete()
+		await message.author.send('Please no swearing in my Christian Discord Server')
+		print(f'Banned message from {user}')
+
 	await bot.process_commands(message)
 
-
+#adds a word to a file containing all banned words
+@bot.command(name='ban_word')
+async def ban_word(ctx, *, word = ''):
+	
+	if(word != ''):
+		word_filter.ban_string(word)
+	
 #makes text channels from user input
 @bot.command(name='makechannel')
 #@commands.has_role('admin')
@@ -90,7 +105,7 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
         'de': 'german',
         'el': 'greek',
         'gu': 'gujarati',
-        'ht': 'haitian creole',
+        'ht': 'haitian',
         'ha': 'hausa',
         'haw': 'hawaiian',
         'iw': 'hebrew',
@@ -108,7 +123,7 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
         'kk': 'kazakh',
         'km': 'khmer',
         'ko': 'korean',
-        'ku': 'kurdish (kurmanji)',
+        'ku': 'kurdish',
         'ky': 'kyrgyz',
         'lo': 'lao',
         'la': 'latin',
@@ -123,7 +138,7 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
         'mi': 'maori',
         'mr': 'marathi',
         'mn': 'mongolian',
-        'my': 'myanmar (burmese)',
+        'my': 'myanmar',
         'ne': 'nepali',
         'no': 'norwegian',
         'ps': 'pashto',
@@ -134,7 +149,7 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
         'ro': 'romanian',
         'ru': 'russian',
         'sm': 'samoan',
-        'gd': 'scots gaelic',
+        'gd': 'gaelic',
         'sr': 'serbian',
         'st': 'sesotho',
         'sn': 'shona',
@@ -170,7 +185,7 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
     newlang = translator.translate(msg, LANGCODES[dst.lower()], src='auto')
 
     #print to console and print to server
-    print(newlang.text)
+    print(f'translated {msg} to {newlang.text}')
     await ctx.send(newlang.text)
 
 bot.run(TOKEN)
