@@ -45,6 +45,20 @@ async def on_message(message):
 
 	await bot.process_commands(message)
 
+#removes user from server and prevents them from joining back for a certain period of time
+#if no time is givin, they can join back immediately.
+@bot.command(name = 'kick')
+async def (user, time=0):
+
+
+#[uts user in a "timeout" role that stops them from sending messages 
+@bot.command(name = 'timeout')
+async def (user, time= 0):
+
+#bans a user from the server, a message can also be sent to them explaining why they were banned
+@bot.command(name = 'ban')
+async def (user, message):
+   
 #adds a word to a file containing all banned words
 @bot.command(name='ban_word')
 async def ban_word(ctx, *, word = ''):
