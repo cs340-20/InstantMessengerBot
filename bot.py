@@ -4,8 +4,9 @@
 import os
 import discord
 import word_filter
+import time 
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from googletrans import Translator
 
@@ -45,20 +46,39 @@ async def on_message(message):
 
 	await bot.process_commands(message)
 
-#removes user from server and prevents them from joining back for a certain period of time
-#if no time is givin, they can join back immediately.
+#Kicks a user from the server. They may join back at any time
 @bot.command(name = 'kick')
-async def (user, time=0):
+async def kick(ctx, member : discord.Member, *, reason = "none"):
 
+	await member.kick(reason = reason)
 
-#[uts user in a "timeout" role that stops them from sending messages 
-@bot.command(name = 'timeout')
-async def (user, time= 0):
-
-#bans a user from the server, a message can also be sent to them explaining why they were banned
 @bot.command(name = 'ban')
-async def (user, message):
-   
+async def ban(ctx, member : discord.Member, days = 0, *, reason= "none"):
+
+    await member.ban(reason = reason, delete_msg_days = days)
+
+
+#puts a user in timeout, prventing them from sending any messages but keeping them in the server
+@bot.command(name = 'timeout')
+async def timeout(ctx, member : discord.Member, TO_time = 0):
+
+	guild = ctx.guild
+	old_roles = member.roles	
+	guild_roles = guild.roles
+	timeout_role_name = "Timeout"
+	
+	if timeout_role_name in guild_roles:
+		timeout_role = guild_roles.get("Timeout");
+	else:
+		timeout_role = await guild.create_role(name = timeout_role_name, hoist = True)
+		
+	await member.edit(roles = [timeout_role])
+	
+	tasks.loop(seconds = TO_time *60, count = 1)
+
+	await member.edit(roles = old_roles)
+	
+
 #adds a word to a file containing all banned words
 @bot.command(name='ban_word')
 async def ban_word(ctx, *, word = ''):
