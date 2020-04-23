@@ -79,11 +79,10 @@ async def on_message(message):
 
 	await bot.process_commands(message)
 
-@bot.command(name = 'help')
-async def help(ctx):
+@bot.command(name = 'documentation')
+async def documentation(ctx):
 
-	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot/blob/master/HelpFile.txt")
-	
+	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot/blob/master/HelpFile.txt")	
 
 #Kicks a user from the server. They may join back at any time
 @bot.command(name = 'kick')
