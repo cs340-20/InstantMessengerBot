@@ -61,12 +61,13 @@ async def on_member_join(member):
 	await member.create_dm()
 	await member.edit(roles = [base_role])
 	await member.dm_channel.send(
-		f'VOLTRON WELCOMES YOU, {member.name}'
+		content = f'VOLTRON WELCOMES YOU, {member.name}'
 	)
 
 #client message parsing 
 @bot.event
 async def on_message(message):
+
 	if (message.author == bot.user):
 		return
 
@@ -78,34 +79,31 @@ async def on_message(message):
 		print(f'Banned message from {user}')
 
 	await bot.process_commands(message)
-
-@bot.command(name = 'help')
-async def help(ctx):
-
-	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot/blob/master/HelpFile.txt"
 	
 #Kicks a user from the server. They may join back at any time
 @bot.command(name = 'kick')
 async def kick(ctx, member : discord.Member, *, reason = "none"):
 
+	if (reason != "none"):
+		await member.create_dm()
+		await member.dm_channel.send( content = ("You were kicked for the following reason: %s" % (reason)) )
+
 	await member.kick(reason = reason)
 
-	if (reason != "none"):
-		await message.member.dm_channel.send{ "You were kicked for the following reason: " + reason }
 
 #bans a user from the server.
 @bot.command(name = 'ban')
-async def ban(ctx, member : discord.Member, days = 0, *, reason= "none"):
+async def ban(ctx, member : discord.Member, days = 0, *, reason = "none"):
 
-    await member.ban(reason = reason, delete_msg_days = days)
-	
 	if (reason != "none"):
-		await message.member.dm_channel.send{ "You were banned for the following reason: " + reason }
+		await member.create_dm()
+		await member.dm_channel.send( content = ("You were banned for the following reason: %s" % (reason)) )
 
+	await member.ban(reason = reason, delete_msg_days = days)
 
 #puts a user in timeout, prventing them from sending any messages but keeping them in the server
 @bot.command(name = 'timeout')
-async def timeout(ctx, member : discord.Member, TO_time, *, reason = "none"):
+async def timeout(ctx, member : discord.Member, TO_time = 0):
 
 	guild = ctx.guild
 	old_roles = member.roles	
@@ -120,35 +118,25 @@ async def timeout(ctx, member : discord.Member, TO_time, *, reason = "none"):
 			timeout_role = i
 			found = True
 	
-	for i in old_roles:
-		print(i.name)
-
 	if found == False:
 		timeout_role = await guild.create_role(name = timeout_role_name)
 
 	await member.edit(roles = [timeout_role])
 
-	for i in member.roles:
-		print(i.name)
-
 	loop = asyncio._get_running_loop()
 	end_time = loop.time() + (TO_time *60)
 
-	if (reason != "none"):
-		await message.member.dm_channel.send{ "You were timed out for %d mintes for the following reason: %s" % (TO_time, reason) }
-	else
-		await message.member.dm_channel.send{ "You have been timed out from the server for %d minutes." % (TO_time) }
+	await member.create_dm()
+	await member.dm_channel.send( content = ("You have been timed out from the server for %d minutes." % (TO_time)) )
 
 	while True:
 		
 		if(loop.time() + 1) >= end_time:
 			await member.edit(roles = old_roles)
-			for i in member.roles:
-				print(i.name)
 			break
 		await asyncio.sleep(1)
 	
-	await message.member.dm_channel.send{ "You are no longer timed out" }
+	await member.dm_channel.send( content = ("You are no longer timed out") )
 
 #adds a word to a file containing all banned words
 @bot.command(name='ban_word')
