@@ -4,8 +4,10 @@
 import os
 import discord
 import word_filter
+from datetime import datetime 
+import asyncio
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from googletrans import Translator
 
@@ -15,26 +17,65 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 bot = commands.Bot(command_prefix='$')
 
-#Prints to console connection confirmation
+base_role_name = "Plebs"
+time_out_time = 0
+
+#Boolean used to see if it is midnight
+def checkIfMidnight():
+	now = datetime.now()
+	seconds_since_midnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+	return seconds_since_midnight == 0
+
+
+
+#Prints to console connection confirmation, initializes roles needed for bot functionality
 @bot.event
 async def on_ready():
-    guild = discord.utils.get(bot.guilds, name=GUILD)
-    print(
-        f'{bot.user} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})'
-    )
+
+	guild = discord.utils.get(bot.guilds, name=GUILD)
+	guild_roles = guild.roles
+	found = False
+
+	print(
+		f'{bot.user} is connected to the following guild:\n'
+		f'{guild.name}(id: {guild.id})'
+	)
+	#removes permmisions from @everyone
+	for i in guild_roles:
+		if i.name == "@everyone":
+			general_permissions = i.permissions
+			await i.edit(permissions = discord.Permissions.none())
+								
+	#intitalizes base role type that gives user permissions normally given by @everyone
+	for i in guild_roles:
+		if base_role_name == i.name:
+			found = True		
+	
+	if found == False:
+		await guild.create_role(name = base_role_name, permissions = general_permissions )
+
 
 # Welcome DM to new user
 @bot.event
 async def on_member_join(member):
+	
+	guild = discord.utils.get(bot.guilds, name=GUILD)
+	guild_roles = guild.roles
+
+	for i in guild_roles:
+		if i.name == base_role_name:
+			base_role = i
+
 	await member.create_dm()
+	await member.edit(roles = [base_role])
 	await member.dm_channel.send(
-		f'VOLTRON WELCOMES YOU, {member.name}'
+		content = f'VOLTRON WELCOMES YOU, {member.name}'
 	)
 
 #client message parsing 
 @bot.event
 async def on_message(message):
+
 	if (message.author == bot.user):
 		return
 
@@ -46,6 +87,71 @@ async def on_message(message):
 		print(f'Banned message from {user}')
 
 	await bot.process_commands(message)
+
+
+#documentation for the bot
+@bot.command(name = 'documentation')
+async def documentation(ctx):
+	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot")
+
+  
+#Kicks a user from the server. They may join back at any time
+@bot.command(name = 'kick')
+async def kick(ctx, member : discord.Member, *, reason = "none"):
+
+	if (reason != "none"):
+		await member.create_dm()
+		await member.dm_channel.send( content = ("You were kicked for the following reason: %s" % (reason)) )
+
+	await member.kick(reason = reason)
+
+
+#bans a user from the server.
+@bot.command(name = 'ban')
+async def ban(ctx, member : discord.Member, days = 0, *, reason = "none"):
+
+	if (reason != "none"):
+		await member.create_dm()
+		await member.dm_channel.send( content = ("You were banned for the following reason: %s" % (reason)) )
+
+	await member.ban(reason = reason, delete_msg_days = days)
+
+#puts a user in timeout, prventing them from sending any messages but keeping them in the server
+@bot.command(name = 'timeout')
+async def timeout(ctx, member : discord.Member, TO_time = 0):
+
+	guild = ctx.guild
+	old_roles = member.roles	
+	guild_roles = guild.roles
+	timeout_role_name = "Timeout"
+	found = False
+	
+	time_out_time = TO_time
+
+	for i in guild_roles:
+		if i.name == timeout_role_name: 
+			timeout_role = i
+			found = True
+	
+	if found == False:
+		timeout_role = await guild.create_role(name = timeout_role_name)
+
+	await member.edit(roles = [timeout_role])
+
+	loop = asyncio._get_running_loop()
+	end_time = loop.time() + (TO_time *60)
+
+	await member.create_dm()
+	await member.dm_channel.send( content = ("You have been timed out from the server for %d minutes." % (TO_time)) )
+
+	while True:
+		
+		if(loop.time() + 1) >= end_time:
+			await member.edit(roles = old_roles)
+			break
+		await asyncio.sleep(1)
+	
+	await member.dm_channel.send( content = ("You are no longer timed out") )
 
 #adds a word to a file containing all banned words
 @bot.command(name='ban_word')
@@ -60,9 +166,17 @@ async def ban_word(ctx, *, word = ''):
 async def makechannel(ctx, channel_name='Voltron-Conference'):
 	guild = ctx.guild
 	existing_channel = discord.utils.get(guild.channels, name=channel_name)
+	cat = discord.utils.get(ctx.guild.categories, name='Member Channels')
+	if not cat:
+		await ctx.guild.create_category('Member Channels')
+		print(f'Creating new channel: {channel_name}')
+		await ctx.send("There is no category for Member channels. Creating one now and try again :-)")
+		return
+
 	if not existing_channel:		
 		print(f'Creating new channel: {channel_name}')
-		await guild.create_text_channel(channel_name)
+		await guild.create_text_channel(channel_name, category=cat)
+	
 
 #translate command 
 @bot.command(name='translate')
@@ -189,3 +303,4 @@ async def translate(ctx, msg="ex phrase: $translate \"Hello!\" french" , dst='en
     await ctx.send(newlang.text)
 
 bot.run(TOKEN)
+
