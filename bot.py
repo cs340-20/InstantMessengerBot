@@ -91,11 +91,17 @@ async def kick(ctx, member : discord.Member, *, reason = "none"):
 
 	await member.kick(reason = reason)
 
+	if (reason != "none"):
+		await message.member.dm_channel.send{ "You were kicked for the following reason: " + reason }
+
 #bans a user from the server.
 @bot.command(name = 'ban')
 async def ban(ctx, member : discord.Member, days = 0, *, reason= "none"):
 
     await member.ban(reason = reason, delete_msg_days = days)
+	
+	if (reason != "none"):
+		await message.member.dm_channel.send{ "You were banned for the following reason: " + reason }
 
 
 #puts a user in timeout, prventing them from sending any messages but keeping them in the server
@@ -126,21 +132,24 @@ async def timeout(ctx, member : discord.Member, TO_time = 0):
 	for i in member.roles:
 		print(i.name)
 
-	print("before")
-
 	loop = asyncio._get_running_loop()
 	end_time = loop.time() + (TO_time *60)
-	
+
+	if (reason != "none"):
+		await message.member.dm_channel.send{ "You were timed out for %d mintes for the following reason: %s" % (TO_time, reason) }
+	else
+		await message.member.dm_channel.send{ "You have been timed out from the server for %d minutes." % (TO_time) }
+
 	while True:
-		print("looping")
+		
 		if(loop.time() + 1) >= end_time:
 			await member.edit(roles = old_roles)
 			for i in member.roles:
 				print(i.name)
 			break
 		await asyncio.sleep(1)
-
-	print("after")
+	
+	await message.member.dm_channel.send{ "You are no longer timed out" }
 
 #adds a word to a file containing all banned words
 @bot.command(name='ban_word')
