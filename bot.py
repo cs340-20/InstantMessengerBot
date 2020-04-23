@@ -159,7 +159,28 @@ async def ban_word(ctx, *, word = ''):
 	
 	if(word != ''):
 		word_filter.ban_string(word)
+
+
+
+
+#deletes text channels from user input
+@bot.command(name='deletechannel')
+async def makechannel(ctx, channel_name=''):
+	guild = ctx.guild
+	existing_channel = discord.utils.get(guild.channels, name=channel_name)
+	cat = discord.utils.get(ctx.guild.categories, name='Member Channels')
+
+#check if name is in cat list
+	for channel in cat.channels:
+		if (channel.name == channel_name):
+			await ctx.send("Deleting temporary user channel")
+			await channel.delete()
+			return
 	
+	await ctx.send("There is no user text channel in Member channels with that name, you cant delete non-temp channels.")
+	return
+
+
 #makes text channels from user input
 @bot.command(name='makechannel')
 #@commands.has_role('admin')
