@@ -79,12 +79,19 @@ async def on_message(message):
 
 	await bot.process_commands(message)
 
+@bot.command(name = 'help')
+async def help(ctx):
+
+	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot/blob/master/HelpFile.txt"
+	
+
 #Kicks a user from the server. They may join back at any time
 @bot.command(name = 'kick')
 async def kick(ctx, member : discord.Member, *, reason = "none"):
 
 	await member.kick(reason = reason)
 
+#bans a user from the server.
 @bot.command(name = 'ban')
 async def ban(ctx, member : discord.Member, days = 0, *, reason= "none"):
 
