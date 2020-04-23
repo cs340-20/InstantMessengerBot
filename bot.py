@@ -4,9 +4,11 @@
 import os
 import discord
 import word_filter
-from datetime import datetime 
 import asyncio
+import urllib
 
+from datetime import datetime 
+from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from googletrans import Translator
@@ -25,7 +27,6 @@ def checkIfMidnight():
 	now = datetime.now()
 	seconds_since_midnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
 	return seconds_since_midnight == 0
-
 
 
 #Prints to console connection confirmation, initializes roles needed for bot functionality
@@ -87,6 +88,19 @@ async def on_message(message):
 		print(f'Banned message from {user}')
 
 	await bot.process_commands(message)
+	
+@bot.command(name = "meme")
+async def caption(ctx):
+
+	fp = "image.png"
+	await ctx.message.attachments[0].save(fp, seek_begin=True, use_cached=False)
+	image = Image.open(fp)
+	image.save(fp)
+
+	final = open(fp, "rb")
+	final_send = discord.File(final)
+
+	await ctx.channel.send(file = final_send)
 
 
 #documentation for the bot
