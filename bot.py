@@ -84,7 +84,6 @@ async def help(ctx):
 
 	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot/blob/master/HelpFile.txt"
 	
-
 #Kicks a user from the server. They may join back at any time
 @bot.command(name = 'kick')
 async def kick(ctx, member : discord.Member, *, reason = "none"):
@@ -106,7 +105,7 @@ async def ban(ctx, member : discord.Member, days = 0, *, reason= "none"):
 
 #puts a user in timeout, prventing them from sending any messages but keeping them in the server
 @bot.command(name = 'timeout')
-async def timeout(ctx, member : discord.Member, TO_time = 0):
+async def timeout(ctx, member : discord.Member, TO_time, *, reason = "none"):
 
 	guild = ctx.guild
 	old_roles = member.roles	
