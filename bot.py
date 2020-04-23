@@ -4,7 +4,7 @@
 import os
 import discord
 import word_filter
-import datetime 
+from datetime import datetime 
 import asyncio
 
 from discord.ext import commands, tasks
@@ -19,6 +19,14 @@ bot = commands.Bot(command_prefix='$')
 
 base_role_name = "Plebs"
 time_out_time = 0
+
+#Boolean used to see if it is midnight
+def checkIfMidnight():
+	now = datetime.now()
+	seconds_since_midnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+	return seconds_since_midnight == 0
+
+
 
 #Prints to console connection confirmation, initializes roles needed for bot functionality
 @bot.event
@@ -148,9 +156,17 @@ async def ban_word(ctx, *, word = ''):
 async def makechannel(ctx, channel_name='Voltron-Conference'):
 	guild = ctx.guild
 	existing_channel = discord.utils.get(guild.channels, name=channel_name)
+	cat = discord.utils.get(ctx.guild.categories, name='Member Channels')
+	if not cat:
+		await ctx.guild.create_category('Member Channels')
+		print(f'Creating new channel: {channel_name}')
+		await ctx.send("There is no category for Member channels. Creating one now and try again :-)")
+		return
+
 	if not existing_channel:		
 		print(f'Creating new channel: {channel_name}')
-		await guild.create_text_channel(channel_name)
+		await guild.create_text_channel(channel_name, category=cat)
+	
 
 #translate command 
 @bot.command(name='translate')
