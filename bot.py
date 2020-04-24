@@ -90,15 +90,18 @@ async def on_message(message):
 	await bot.process_commands(message)
 	
 @bot.command(name = "meme")
-async def caption(ctx, fontsize:int, x:int=0, y:int=0, *, Text:str):
+async def caption(ctx, fontsize:int, Text:str):
 
 	fp = ctx.message.attachments[0].filename
 	await ctx.message.attachments[0].save(fp, seek_begin=True, use_cached=False)
-	
 	image = Image.open(fp)
 	font_type = ImageFont.truetype("arial.ttf", fontsize)
 	draw = ImageDraw.Draw(image)
-	draw.text(xy = (x, y), text= Text, fill = (255,255,255), font = font_type)
+
+	pix_width, pix_height = draw.textsize(Text, font = font_type)
+	width = image.width
+	height = image.height
+	draw.text(xy = ((width-pix_width)/2, (height-pix_height) - ((height-pix_height) / 10)), text= Text, fill = (255, 255, 255), font = font_type)
 	image.save(fp)
 
 	final = open(fp, "rb")
