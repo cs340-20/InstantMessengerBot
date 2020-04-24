@@ -90,7 +90,7 @@ async def on_message(message):
 	await bot.process_commands(message)
 	
 @bot.command(name = "meme")
-async def caption(ctx, fontsize:int, Text:str):
+async def caption(ctx, fontsize:int, *, Text:str):
 
 	fp = ctx.message.attachments[0].filename
 	await ctx.message.attachments[0].save(fp, seek_begin=True, use_cached=False)
