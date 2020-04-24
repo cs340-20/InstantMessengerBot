@@ -90,17 +90,24 @@ async def on_message(message):
 	await bot.process_commands(message)
 	
 @bot.command(name = "meme")
-async def caption(ctx):
+async def caption(ctx, fontsize:int, x:int=0, y:int=0, *, Text:str):
 
-	fp = "image.png"
+	fp = ctx.message.attachments[0].filename
 	await ctx.message.attachments[0].save(fp, seek_begin=True, use_cached=False)
+	
 	image = Image.open(fp)
+	font_type = ImageFont.truetype("arial.ttf", fontsize)
+	draw = ImageDraw.Draw(image)
+	draw.text(xy = (x, y), text= Text, fill = (255,255,255), font = font_type)
 	image.save(fp)
 
 	final = open(fp, "rb")
 	final_send = discord.File(final)
 
 	await ctx.channel.send(file = final_send)
+
+	final.close()
+	os.remove(fp)
 
 
 #documentation for the bot
