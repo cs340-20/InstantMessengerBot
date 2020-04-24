@@ -18,8 +18,8 @@ The terminal will recieve various pieces of information on the channel the bot h
 
  - ban_word (ban_word word) -> Adds a word to the server's current list of banned words.
 
- - timeout (timeout [minutes]) -> Puts a user in a timed-out state, effectively issuing a temporary ban without removing them from the server.
+ - timeout (timeout minutes) -> Puts a user in a timed-out state, effectively issuing a temporary ban without removing them from the server.
 
- - kick (kick [user] [reason]) -> Removes a user from the server. They may join back.
+ - kick (kick user [reason]) -> Removes a user from the server. They may join back.
 
- - ban (ban [user] [reason]) -> Bans a user from the server.
+ - ban (ban user [reason]) -> Bans a user from the server.
