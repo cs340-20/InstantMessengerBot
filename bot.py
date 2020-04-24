@@ -182,6 +182,19 @@ async def ban_word(ctx, *, word = ''):
 		word_filter.ban_string(word)
 
 
+#makes squad function
+@bot.command(name='squad')
+async def makechannel(ctx, num_user=5, cname='Temp Voice'):
+#check if name is in cat list
+	guild = ctx.guild
+	cat = discord.utils.get(ctx.guild.categories, name='Member Channels')
+	if not cat:
+		await ctx.guild.create_category('Member Channels')
+		await ctx.send("There is no category for Member channels. Creating one now and try again :-)")
+		return
+
+	#make user channel
+	await guild.create_voice_channel(cname, category=cat, user_limit=num_user)
 
 
 #deletes text channels from user input
