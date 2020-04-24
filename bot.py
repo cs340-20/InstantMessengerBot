@@ -4,9 +4,11 @@
 import os
 import discord
 import word_filter
-from datetime import datetime 
 import asyncio
+import urllib
 
+from datetime import datetime 
+from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from googletrans import Translator
@@ -25,7 +27,6 @@ def checkIfMidnight():
 	now = datetime.now()
 	seconds_since_midnight = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
 	return seconds_since_midnight == 0
-
 
 
 #Prints to console connection confirmation, initializes roles needed for bot functionality
@@ -87,12 +88,35 @@ async def on_message(message):
 		print(f'Banned message from {user}')
 
 	await bot.process_commands(message)
+	
+@bot.command(name = "meme")
+async def caption(ctx, fontsize:int, *, Text:str):
+
+	fp = ctx.message.attachments[0].filename
+	await ctx.message.attachments[0].save(fp, seek_begin=True, use_cached=False)
+	image = Image.open(fp)
+	font_type = ImageFont.truetype("arial.ttf", fontsize)
+	draw = ImageDraw.Draw(image)
+
+	pix_width, pix_height = draw.textsize(Text, font = font_type)
+	width = image.width
+	height = image.height
+	draw.text(xy = ((width-pix_width)/2, (height-pix_height) - ((height-pix_height) / 10)), text= Text, fill = (255, 255, 255), font = font_type)
+	image.save(fp)
+
+	final = open(fp, "rb")
+	final_send = discord.File(final)
+
+	await ctx.channel.send(file = final_send)
+
+	final.close()
+	os.remove(fp)
 
 
 #documentation for the bot
 @bot.command(name = 'documentation')
 async def documentation(ctx):
-	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot")
+	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot/blob/master/README.md")
 
   
 #Kicks a user from the server. They may join back at any time
@@ -159,7 +183,41 @@ async def ban_word(ctx, *, word = ''):
 	
 	if(word != ''):
 		word_filter.ban_string(word)
+
+
+#makes squad function
+@bot.command(name='squad')
+async def makechannel(ctx, num_user=5, cname='Temp Voice'):
+#check if name is in cat list
+	guild = ctx.guild
+	cat = discord.utils.get(ctx.guild.categories, name='Member Channels')
+	if not cat:
+		await ctx.guild.create_category('Member Channels')
+		await ctx.send("There is no category for Member channels. Creating one now and try again :-)")
+		return
+
+	#make user channel
+	await guild.create_voice_channel(cname, category=cat, user_limit=num_user)
+
+
+#deletes text channels from user input
+@bot.command(name='deletechannel')
+async def makechannel(ctx, channel_name=''):
+	guild = ctx.guild
+	existing_channel = discord.utils.get(guild.channels, name=channel_name)
+	cat = discord.utils.get(ctx.guild.categories, name='Member Channels')
+
+#check if name is in cat list
+	for channel in cat.channels:
+		if (channel.name == channel_name):
+			await ctx.send("Deleting temporary user channel")
+			await channel.delete()
+			return
 	
+	await ctx.send("There is no user text channel in Member channels with that name, you cant delete non-temp channels.")
+	return
+
+
 #makes text channels from user input
 @bot.command(name='makechannel')
 #@commands.has_role('admin')

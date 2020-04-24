@@ -2,3 +2,4 @@
 trump
 $
 !play
+hello
