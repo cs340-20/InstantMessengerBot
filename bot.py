@@ -113,7 +113,7 @@ async def caption(ctx, fontsize:int, x:int=0, y:int=0, *, Text:str):
 #documentation for the bot
 @bot.command(name = 'documentation')
 async def documentation(ctx):
-	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot")
+	await ctx.channel.send("Please see this link for a detailed list of commands and their syntax: https://github.com/cs340-20/InstantMessengerBot/blob/master/README.md")
 
   
 #Kicks a user from the server. They may join back at any time
